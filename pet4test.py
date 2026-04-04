@@ -1,5 +1,13 @@
 import customtkinter as ctk
 import json
+import logging
+
+logging.basicConfig(
+    filename="app.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    encoding="utf-8",
+)
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -144,6 +152,7 @@ class App(ctk.CTk):
 
             self.update_balance_display()
             print(f"Куплено: {name} за {price}")
+            logging.info(f"Куплено:{name} за {price}. Остаток:{self.balance}")
         else:
             print("Недостаточно средств!")
 
@@ -196,6 +205,7 @@ class App(ctk.CTk):
                     json.dump(goals, f, ensure_ascii=False, indent=4)
 
                 self.load_skills()
+                logging.warning(f"Удаление:Навык {name_to_delete} был удален.")
         except Exception as e:
             print(f"Ошибка удаления: {e}")
 
@@ -226,6 +236,7 @@ class App(ctk.CTk):
 
             self.load_skills()  # обновить отображение навыков
             self.update_balance_display()
+            logging.info(f"Прогресс: Навык {name} +10xp. Баланс:{self.balance}")
         except Exception as e:
             print(f"Ошибка при добавлении XP: {e}")
 
