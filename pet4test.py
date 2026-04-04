@@ -5,6 +5,7 @@ import csv
 from datetime import datetime
 import shutil
 import os
+import requests
 
 logging.basicConfig(
     filename="app.log",
@@ -245,6 +246,8 @@ class App(ctk.CTk):
                 goals[name]["xp"] = 0
                 goals[name]["level"] += 1
                 print(f"Уровень навыка '{name}' повышен до {goals[name]['level']}")
+                msg = f"Уровень повышек! Навык {name} теперь {goals[name]["level"]} уровня!"
+                self.send_tg_notification(msg)
 
             with open("my_goals.json", "w", encoding="utf-8") as f:
                 json.dump(goals, f, ensure_ascii=False, indent=4)
@@ -344,6 +347,18 @@ class App(ctk.CTk):
                 print(f"Резервная копия создана:{backup_name}")
         except Exception as e:
             logging.error(f"Ошибка бекапа:{e}")
+
+    # Оправка сообщения
+    def send_tg_notification(self, message):
+        token = "TokenidHere"
+        chat_id = "Chatidhere"
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        try:
+            payload = {"chat_id": chat_id, "text": message}
+            requests.post(url, json=payload, timeout=5)
+            logging.info(f"TG:Уведомление отправлено: {message}")
+        except Exception as e:
+            logging.error(f"TG Error:Не удалось отправить сообщение{e}")
 
 
 if __name__ == "__main__":
