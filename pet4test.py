@@ -1,6 +1,8 @@
 import customtkinter as ctk
 import json
 import logging
+import csv
+from datetime import datetime
 
 logging.basicConfig(
     filename="app.log",
@@ -65,6 +67,16 @@ class App(ctk.CTk):
             self.tabview.tab("Магазин"), width=450, height=300
         )
         self.shop_list.pack(pady=10, padx=10, fill="both", expand=True)
+
+        # Кнопка экспорта в csv
+        self.export_btn = ctk.CTkButton(
+            self.tabview.tab("Навыки"),
+            text="Выгрузить отчет",
+            fg_color="green",
+            hover_color="#013220",
+            command=self.export_to_csv,
+        )
+        self.export_btn.pack(pady=5)
 
         # Загрузка данных при старте
         self.load_skills()
@@ -296,6 +308,25 @@ class App(ctk.CTk):
             print("Файл my_goals.json не найден. Будет создан при добавлении навыка.")
         except Exception as e:
             print(f"Ошибка загрузки навыков: {e}")
+
+    def export_to_csv(self):
+        try:
+            with open("my_goals.json", "r", encoding="utf-8") as f:
+                goals = json.load(f)
+                filename = f"report_{datetime.now().strftime("%Y-%m-%d")}.csv"
+                with open(filename, "w", encoding="utf-16", newline="") as f:
+                    writer = csv.writer(f, delimiter="\t")
+                    writer.writerow(["Навык", "Уровень", "Опыт(XP)"])
+                    for key, value in goals.items():
+                        if key not in (
+                            "balance",
+                            "shop",
+                        ) and isinstance(value, dict):
+                            writer.writerow([key, value.get("level"), value.get("xp")])
+                            print(f"Отчет успешно создан: {filename}")
+        except Exception as e:
+            print(f"Ошибка при экспорте:{e}")
+            logging.error(f"Ошибка экспорта:{e}")
 
 
 if __name__ == "__main__":
