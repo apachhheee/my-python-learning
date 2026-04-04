@@ -3,6 +3,8 @@ import json
 import logging
 import csv
 from datetime import datetime
+import shutil
+import os
 
 logging.basicConfig(
     filename="app.log",
@@ -81,6 +83,7 @@ class App(ctk.CTk):
         # Загрузка данных при старте
         self.load_skills()
         self.load_shop()
+        self.create_backup()
 
     # Работа с магазином
     def add_item_event(self):
@@ -327,6 +330,20 @@ class App(ctk.CTk):
         except Exception as e:
             print(f"Ошибка при экспорте:{e}")
             logging.error(f"Ошибка экспорта:{e}")
+
+    # Система бекапов
+    def create_backup(sefl):
+        try:
+            if not os.path.exists("backups"):
+                os.makedirs("backups")
+            if os.path.exists("my_goals.json"):
+                timestamp = datetime.now().strftime("%Y-%M-%D_%H-%M")
+                backup_name = f"backups/backup_{timestamp}.json"
+                shutil.copy("my_goals.json", backup_name)
+                logging.info(f"Бэкап:Создана копия {backup_name}")
+                print(f"Резервная копия создана:{backup_name}")
+        except Exception as e:
+            logging.error(f"Ошибка бекапа:{e}")
 
 
 if __name__ == "__main__":
